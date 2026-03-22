@@ -40,17 +40,17 @@ public class FileUploadController {
     }
     
     private String generateFilename(String market, String fileType) {
-        switch (fileType) {
-            case "sh000001": return "000001.SH.csv";
-            case "sh000300": return "000300.SH.csv";
-            case "sz399006": return "399006.SZ.csv";
-            case "dji": return "DJI.csv";
-            case "nasdaq": return "NASDAQ.csv";
-            case "sp500": return "SP500.csv";
-            case "hsi": return "HSI.csv";
-            case "hkah": return "HKAH.csv";
-            case "moneygrow": return "MoneyGrow_" + market + ".txt";
-            default: return fileType + ".csv";
-        }
+        return switch (fileType) {
+            case "sh000001" -> "000001.SH.csv";
+            case "sh000300" -> "000300.SH.csv";
+            case "sz399006" -> "399006.SZ.csv";
+            case "dji" -> "DJI.csv";
+            case "nasdaq" -> "NASDAQ.csv";
+            case "sp500" -> "SP500.csv";
+            case "hsi" -> "HSI.csv";
+            case "hkah" -> "HKAH.csv";
+            case "moneygrow" -> "MoneyGrow_" + market + ".txt";
+            default -> fileType + ".csv";
+        };
     }
 }
