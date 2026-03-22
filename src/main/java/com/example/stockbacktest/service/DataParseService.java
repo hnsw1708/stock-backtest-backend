@@ -126,9 +126,9 @@ public class DataParseService {
                 System.out.println("开始资金曲线与股票数据日期对齐...");
 
                 // 获取股票数据的日期范围
-                LocalDate firstStockDate = LocalDate.parse(stockDataList.get(0).getDate(), STOCK_DATE_FORMATTER);
+                LocalDate firstStockDate = LocalDate.parse(stockDataList.getFirst().getDate(), STOCK_DATE_FORMATTER);
                 LocalDate lastStockDate = LocalDate.parse(
-                        stockDataList.get(stockDataList.size()-1).getDate(), STOCK_DATE_FORMATTER);
+                        stockDataList.getLast().getDate(), STOCK_DATE_FORMATTER);
 
                 System.out.println("股票数据日期范围: " + firstStockDate + " 到 " + lastStockDate);
 
