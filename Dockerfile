@@ -11,7 +11,7 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -q -e -DskipTests clean package
 
 # ---------- Run stage (slim JRE) ----------
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
