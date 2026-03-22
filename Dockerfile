@@ -11,10 +11,11 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -q -e -DskipTests clean package
 
 # ---------- Run stage (slim JRE) ----------
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --from=build /app/target/*.jar app.jar
-
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
+RUN chown appuser:appgroup app.jar
+USER appuser
 EXPOSE 8080
-CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]
