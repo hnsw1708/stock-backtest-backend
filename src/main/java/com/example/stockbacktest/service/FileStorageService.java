@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Service
@@ -24,9 +23,9 @@ public class FileStorageService {
     
     public void init() {
         try {
-            Files.createDirectories(Paths.get(cnDir));
-            Files.createDirectories(Paths.get(usDir));
-            Files.createDirectories(Paths.get(hkDir));
+            Files.createDirectories(Path.of(cnDir));
+            Files.createDirectories(Path.of(usDir));
+            Files.createDirectories(Path.of(hkDir));
         } catch (IOException e) {
             throw new RuntimeException("Could not create upload directories!");
         }
@@ -35,7 +34,7 @@ public class FileStorageService {
     public String storeFile(MultipartFile file, String market, String fileName) {
         try {
             String dir = getMarketDirectory(market);
-            Path targetLocation = Paths.get(dir).resolve(fileName);
+            Path targetLocation = Path.of(dir).resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
             return fileName;
         } catch (IOException ex) {
@@ -54,7 +53,7 @@ public class FileStorageService {
     
     public Path loadFile(String market, String filename) {
         String dir = getMarketDirectory(market);
-        return Paths.get(dir).resolve(filename);
+        return Path.of(dir).resolve(filename);
     }
     
     public boolean fileExists(String market, String filename) {
