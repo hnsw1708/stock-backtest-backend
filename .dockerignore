@@ -1,5 +1,8 @@
-target
 .git
 .gitignore
-.DS_Store
-logs
+target/
+*.md
+.idea/
+*.iml
+.mvn/
+.github/
