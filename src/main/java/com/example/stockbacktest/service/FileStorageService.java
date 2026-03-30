@@ -26,8 +26,8 @@ public class FileStorageService {
             Files.createDirectories(Path.of(cnDir));
             Files.createDirectories(Path.of(usDir));
             Files.createDirectories(Path.of(hkDir));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create upload directories!");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create upload directories!", e);
         }
     }
     
