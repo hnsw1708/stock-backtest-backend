@@ -88,6 +88,14 @@ public class DataParseService {
         return stockDataList;
     }
 
+    /**
+     * Overloaded convenience method that delegates to the three-argument version
+     * with an empty stock data list.
+     */
+    public List<MoneyGrowData> parseMoneyGrowData(String market, String filename) {
+        return parseMoneyGrowData(market, filename, Collections.emptyList());
+    }
+
     public List<MoneyGrowData> parseMoneyGrowData(String market, String filename, List<StockData> stockDataList) {
         List<MoneyGrowData> moneyGrowList = new ArrayList<>();
         try {
@@ -128,7 +136,7 @@ public class DataParseService {
                 // 获取股票数据的日期范围
                 LocalDate firstStockDate = LocalDate.parse(stockDataList.get(0).getDate(), STOCK_DATE_FORMATTER);
                 LocalDate lastStockDate = LocalDate.parse(
-                        stockDataList.get(stockDataList.size()-1).getDate(), STOCK_DATE_FORMATTER);
+                        stockDataList.get(stockDataList.size() - 1).getDate(), STOCK_DATE_FORMATTER);
 
                 System.out.println("股票数据日期范围: " + firstStockDate + " 到 " + lastStockDate);
 
@@ -142,39 +150,34 @@ public class DataParseService {
 
                 // 为每个股票数据日期找到对应的资金值
                 Double lastValidMoneyValue = null;
-                for (StockData stockData : stockDataList) {
-                    LocalDate stockDate = LocalDate.parse(stockData.getDate(), STOCK_DATE_FORMATTER);
-
-                    // 查找该日期的资金值
+                for (StockData stock : stockDataList) {
+                    LocalDate stockDate = LocalDate.parse(stock.getDate(), STOCK_DATE_FORMATTER);
                     Double moneyValue = rawMoneyData.get(stockDate);
-
-                    // 如果该日期没有资金数据，使用前一个有效值（向前填充）
-                    if (moneyValue == null) {
-                        moneyValue = lastValidMoneyValue;
-                    } else {
+                    if (moneyValue != null) {
                         lastValidMoneyValue = moneyValue;
                     }
-
-                    // 如果仍然没有有效值，跳过或使用默认值
-                    if (moneyValue != null) {
-                        // 将股票日期格式转换回字符串用于资金曲线数据
-                        String formattedDate = stockDate.format(STOCK_DATE_FORMATTER);
-                        MoneyGrowData alignedData = new MoneyGrowData(formattedDate, moneyValue);
-                        moneyGrowList.add(alignedData);
+                    if (lastValidMoneyValue != null) {
+                        MoneyGrowData mgd = new MoneyGrowData(
+                                stock.getDate(),
+                                lastValidMoneyValue
+                        );
+                        moneyGrowList.add(mgd);
                     }
                 }
-
-                System.out.println("日期对齐完成: 原始资金数据 " + rawMoneyData.size() + " 条, 对齐后 " + moneyGrowList.size() + " 条");
-
             } else {
-                // 如果没有股票数据，使用原始资金数据（已排序）
-                rawMoneyData.entrySet().stream()
-                        .sorted(Map.Entry.comparingByKey())
-                        .forEach(entry -> {
-                            String formattedDate = entry.getKey().format(STOCK_DATE_FORMATTER);
-                            moneyGrowList.add(new MoneyGrowData(formattedDate, entry.getValue()));
-                        });
+                // No stock data provided, just return raw money data sorted by date
+                List<LocalDate> sortedDates = new ArrayList<>(rawMoneyData.keySet());
+                Collections.sort(sortedDates);
+                for (LocalDate date : sortedDates) {
+                    MoneyGrowData mgd = new MoneyGrowData(
+                            date.format(STOCK_DATE_FORMATTER),
+                            rawMoneyData.get(date)
+                    );
+                    moneyGrowList.add(mgd);
+                }
             }
+
+            System.out.println("资金曲线解析完成, 总计=" + moneyGrowList.size());
 
         } catch (IOException e) {
             System.err.println("资金曲线文件读取失败: " + e.getMessage());
@@ -184,10 +187,5 @@ public class DataParseService {
             e.printStackTrace();
         }
         return moneyGrowList;
-    }
-
-    // 为了向后兼容，保留原来的方法签名
-    public List<MoneyGrowData> parseMoneyGrowData(String market, String filename) {
-        return parseMoneyGrowData(market, filename, null);
     }
 }
